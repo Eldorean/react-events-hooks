@@ -12,11 +12,11 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/Eldorean/react-event-hooks.git"
+    "url": "https://github.com/Eldorean/react-events-hooks.git"
   },
-  "homepage": "https://github.com/Eldorean/react-event-hooks",
+  "homepage": "https://github.com/Eldorean/react-events-hooks",
   "bugs": {
-    "url": "https://github.com/Eldorean/react-event-hooks/issues"
+    "url": "https://github.com/Eldorean/react-events-hooks/issues"
   },
   "keywords": [
     "react",
