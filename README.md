@@ -16,6 +16,7 @@ import { Emitter, Listener } from 'react-events-hooks';
 
 const EVENT_NAME = 'event-fancybutton-click';
 
+// Creates a button with an Emitter
 export class FancyButton extends React.Component<{ value: number, link: string }> {
   private _emitter = Emitter.New(`${EVENT_NAME}_${this.props.link}`);
   public render = () => (
@@ -24,6 +25,7 @@ export class FancyButton extends React.Component<{ value: number, link: string }
   private clickHandler = () => this._emitter.Notify({ value: this.props.value });
 }
 
+// Creates a label with a Listener
 export class FancyLabel extends React.Component<{ link: string }> {
   public state = { number: 0 };
   private _listener!: Listener;
