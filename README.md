@@ -1,17 +1,16 @@
 # react-event-hooks
-An event system to be used with react hooks
+An event system to be used in combination with react hooks. Decouples your components and enhances there re-usability.
 
-### Install
+## Install
 ```js
 $ npm install react-events-hooks
 ```
 
-### Live Examples
+## Live Examples
 Comming soon!!!
 
-### Usage
+## Usage
 ```js
-// ES6 Imports
 import React from 'react';
 import { Emitter, Listener } from 'react-events-hooks';
 
@@ -43,236 +42,125 @@ export class FancyLabel extends React.Component<{ link: string }> {
     <span >{this.state.number}</span>
   )
 }
-
-// Now you can create the following in a render
-
-      <FancyButton value={1} link="link1" />
-      <FancyButton value={2} link="link1" />
-      <FancyLabel link="link1" />
-      <hr />
-      <FancyButton value={1} link="link2" />
-      <FancyButton value={2} link="link2" />
-      <FancyButton value={3} link="link1" />
-      <FancyLabel link="link2" />
-
 ```
 
-### Emitter class
-Don't use the `new Emitter()`, instead use the `Emitter.New()`. <br />
-This is done so that the emitter is automaticly registered to the internal event system.
+Now you can create the following in a render. I've registered the last FancyButton to the first FancyLabel to illustrate the decoupling of the components.
 
-**properties**
-| ------------- | ----------------- | -------------
-| authors?      | IAuthorValue[]    | See the type specifications in the next table.
-| dates?        | IDateValue[]      | See the type specifications in the table below.
+```html
+<FancyButton value={1} link="link1" />
+<FancyButton value={2} link="link1" />
+<FancyLabel link="link1" />
+<hr />
+<FancyButton value={1} link="link2" />
+<FancyButton value={2} link="link2" />
+<FancyButton value={3} link="link1" />
+<FancyLabel link="link2" />
+```
+
+## Emitter class
+The Emitter class sends a signal to all listeners that are registert to it. 
 
 
+> **Warning:**   
+**Don't use the `new Emitter()`, instead use the `Emitter.New(tag: string)`. <br />**
+**This is done so that the emitter is automaticly registered to the internal event system.**
+
+**Static**
+<table>
+  <tr>
+    <td width="150">New(tag: string)</td>
+    <td>Creates a new or finds the current emitter in the internal event system registered to the tag .</td>
+  </tr>
+</table>
+
+**Properties**
+<table>
+  <tr>
+    <td width="150">Count: number</td>
+    <td>Return the number of listeners currently attached this emitter.</td>
+  </tr>
+  <tr>
+    <td>Tag: string</td>
+    <td>Return the event tab name</td>
+  </tr>
+</table>
+
+**Methods**
+<table>
+  <tr>
+    <td width="150">Attach(Listener)</td>
+    <td>Attaches the listener to the emitter.</td>
+  </tr>
+  <tr>
+    <td>Detach(Listener)</td>
+    <td>Detaches the listener from the emitter.</td>
+  </tr>
+  <tr>
+    <td>Notify(props: any)</td>
+    <td>Sends a signal to all listeners functions with the props</td>
+  </tr>
+</table>
+
+## Listener class
+The Listener class executes his registered function when the emitter sends a notification. 
+
+> **Warning:**   
+**Don't use `new Listener()`, instead use the `Listener.New(tag: string | string[], () => void)`. <br />**
+**This is done so that the Listener is automaticly registered to the right emitter.**
+
+**Static**
+<table>
+  <tr>
+    <td width="150">New(tag: string | string[], () => {})</td>
+    <td>Creates a new listener and registers to the emitter with the corresponding tag. Function is triggered when the emitter sends a notification.</td>
+  </tr>
+</table>
+
+**Properties**
+<table>
+  <tr>
+    <td width="150">Update: (props?: any) => void</td>
+    <td>Hold the update function that is triggered when the emitter sends a notification</td>
+  </tr>
+</table>
+
+**Methods**
+<table>
+  <tr>
+    <td width="150">Destroy()</td>
+    <td>Detaches the listener from the corresponding emitter.</td>
+  </tr>
+</table>
+
+## Hooks
+There are also two hooks: 
+* useEmitter
+* useListener
+
+This example is the same as above only writen with hooks.
 ```js
-<Link activeClass="active"
-      to="target"
-      spy={true}
-      smooth={true}
-      hashSpy={true}
-      offset={50}
-      duration={500}
-      delay={1000}
-      isDynamic={true}
-      onSetActive={this.handleSetActive}
-      onSetInactive={this.handleSetInactive}
-      ignoreCancelEvents={false}
->
-  Your name
-</Link>
+import React, { useState } from 'react';
+import { useEmitter, useListener } from 'react-events-hooks';
+
+const EVENT_NAME = 'event-fancybutton-click';
+
+export const FancyButton: React.FC<{ value: number, link: string }> = ({ value, link }) => {
+  const notify = useEmitter(`${EVENT_NAME}_${link}`);
+  const clickHandler = () => notify({ value });
+
+  return <button onClick={clickHandler} >{value}</button>;
+};
+
+export const FancyLabel: React.FC<{ link: string }> = ({ link }) => {
+  const [num, setNum] = useState(0);
+  useListener(`${EVENT_NAME}_${link}`, ({ value }) => setNum((pref) => pref + value));
+
+  return <span >{num}</span>;
+};
 ```
-
-### Scroll Methods
-
-> Scroll To Top
-
-```js
-
-var Scroll = require('react-scroll');
-var scroll = Scroll.animateScroll;
-
-scroll.scrollToTop(options);
-
-```
-
-> Scroll To Bottom
-
-```js
-
-var Scroll = require('react-scroll');
-var scroll = Scroll.animateScroll;
-
-scroll.scrollToBottom(options);
-
-```
-
-> Scroll To (position)
-
-```js
-
-var Scroll = require('react-scroll');
-var scroll = Scroll.animateScroll;
-
-scroll.scrollTo(100, options);
-
-```
-
-> Scroll To (Element)
-
-animateScroll.scrollTo(positionInPixels, props = {});
-
-```js
-
-var Scroll = require('react-scroll');
-var Element = Scroll.Element;
-var scroller = Scroll.scroller;
-
-<Element name="myScrollToElement"></Element>
-
-// Somewhere else, even another file
-scroller.scrollTo('myScrollToElement', {
-  duration: 1500,
-  delay: 100,
-  smooth: true,
-  containerId: 'ContainerElementID',
-  offset: 50, // Scrolls to element + 50 pixels down the page
-  ...
-})
-
-```
-
-> Scroll More (px)
-
-```js
-
-var Scroll = require('react-scroll');
-var scroll = Scroll.animateScroll;
-
-scroll.scrollMore(10, options);
-
-```
-
-### Scroll events
-
-> begin - start of the scrolling
-
-```js
-
-var Scroll = require('react-scroll');
-var Events = Scroll.Events;
-
-Events.scrollEvent.register('begin', function(to, element) {
-  console.log("begin", to, element);
-});
-
-```
-
-> end - end of the scrolling/animation
-
-```js
-
-Events.scrollEvent.register('end', function(to, element) {
-  console.log("end", to, element);
-});
-
-```
+As you can see, the listener now no longer needs to be destroyed. This is done automaticly when the component is unmounted
 
 
-> Remove events
-
-```js
-
-Events.scrollEvent.remove('begin');
-Events.scrollEvent.remove('end');
-
-```
-
-
-#### Create your own Link/Element
-> Simply just pass your component to one of the high order components (Element/Scroll)
-
-```js
-var React   = require('react');
-var Scroll  = require('react-scroll');
-var ScrollLink = Scroll.ScrollLink;
-var ScrollElement = Scroll.ScrollElement;
-
-var Element = React.createClass({
-  render: function () {
-    return (
-      <div {...this.props}>
-        {this.props.children}
-      </div>
-    );
-  }
-});
-
-module.exports = ScrollElement(Element);
-
-var Link = React.createClass({
-  render: function () {
-    return (
-      <a {...this.props}>
-        {this.props.children}
-      </a>
-    );
-  }
-});
-
-module.exports = ScrollLink(Link);
-
-```
-
-### Scroll Animations
-> Add a custom easing animation to the smooth option. This prop will accept a Boolean if you want the default, or any of the animations listed below
-
-```js
-
-scroller.scrollTo('myScrollToElement', {
-  duration: 1500,
-  delay: 100,
-  smooth: "easeInOutQuint",
-  containerId: 'ContainerElementID',
-  ...
-})
-
-```
-
-> List of currently available animations:
-
-```
-linear
-	- no easing, no acceleration.
-easeInQuad
-	- accelerating from zero velocity.
-easeOutQuad
-	- decelerating to zero velocity.
-easeInOutQuad
-	- acceleration until halfway, then deceleration.
-easeInCubic
-	- accelerating from zero velocity.
-easeOutCubic
-	- decelerating to zero velocity.
-easeInOutCubic
-	- acceleration until halfway, then deceleration.
-easeInQuart
-	- accelerating from zero velocity.
-easeOutQuart
-	- decelerating to zero velocity.
-easeInOutQuart
-	-  acceleration until halfway, then deceleration.
-easeInQuint
-	- accelerating from zero velocity.
-easeOutQuint
-	- decelerating to zero velocity.
-easeInOutQuint
-	- acceleration until halfway, then deceleration.
-```
-
-A good visual reference can be found at [easings.net](http://easings.net/)
 
 #### Changelog
 - [See the CHANGELOG](./CHANGELOG.md)
